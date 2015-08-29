@@ -11,7 +11,7 @@ import org.apache.poi.hslf.model.Slide;
 import org.apache.poi.hslf.model.TextRun;
 import org.apache.poi.hslf.usermodel.SlideShow;
 
-public class App {
+public class PPTSearch {
 	public static void main(String[] args) {
 		String path = args[0];
 		String ptn = args[1];
@@ -26,7 +26,7 @@ public class App {
 	}
 
 	private static void searchPPT(File file, Pattern pattern) {
-		String absolutePath = file.getAbsolutePath();
+		String filename = file.getName();
 		if (file.exists()) {
 			if (file.isDirectory()) {
 				for (File f : file.listFiles()) {
@@ -36,9 +36,7 @@ public class App {
 				if (file.getName().endsWith(".ppt") || file.getName().endsWith(".pptx")) {
 					SlideShow ppt = null;
 					try {
-						System.out.println("Searching in " + absolutePath);
-
-						ppt = new SlideShow(new HSLFSlideShow(absolutePath));
+						ppt = new SlideShow(new HSLFSlideShow(file.getAbsolutePath()));
 						Slide[] slides = ppt.getSlides();
 						int slideCnt = slides.length;
 						for (int i = 0; i < slideCnt; ++i) {
@@ -46,8 +44,10 @@ public class App {
 								String text = run.getText();
 								Matcher matcher = pattern.matcher(text);
 								if (matcher.find()) {
-									System.out.println("Slide : " + (i + 1));
-									System.out.println(text);
+									System.out.println("\n"
+											+ "[File : " + filename + ", "
+											+ "Slide : " + (i + 1) + "]\n"
+											+ text);
 								}
 							}
 						}
@@ -55,7 +55,7 @@ public class App {
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						// e.printStackTrace();
-						System.out.println("Something wrong when searching " + absolutePath);
+						System.out.println("Something wrong when searching " + filename);
 					} finally {
 						// Is it neccessary to close ppt? And how?
 						if (ppt != null) {
@@ -64,7 +64,7 @@ public class App {
 				}
 			}
 		} else {
-			System.out.println("File or Dir not exists : " + absolutePath);
+			System.out.println("File or Dir not exists : " + filename);
 		}
 	}
 }
